@@ -3,61 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>顧客情報入力</title>
+    <title>案件情報入力</title>
     <!-- Bootstrap CSSの読み込み -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container mt-5">
-        <h2 class="mb-4">顧客情報を入力してください</h2>
-        <form id="customer-form">
-            <div class="form-group">
-                <label for="companyName">会社名:</label>
-                <input type="text" class="form-control" id="companyName" name="companyName" required>
-            </div>
-            <div class="form-group">
-                <label for="industry">業種:</label>
-                <input type="text" class="form-control" id="industry" name="industry" required>
-            </div>
-            <div class="form-group">
-                <label for="contact">連絡先:</label>
-                <input type="text" class="form-control" id="contact" name="contact" required>
-            </div>
-            <div class="form-group">
-                <label for="location">所在地:</label>
-                <input type="text" class="form-control" id="location" name="location" required>
-            </div>
-            <button type="submit" class="btn btn-primary">送信</button>
-        </form>
-    </div>
-    <script type="module">
-        import config from '../config.js';
+  <h2>顧客情報登録</h2>
+<form id="customer-form">
+  <div class="form-group">
+    <label for="companyName">会社名</label>
+    <input type="text" class="form-control" id="companyName" required>
+  </div>
+  <div class="form-group">
+    <label for="industry">業種</label>
+    <input type="text" class="form-control" id="industry" required>
+  </div>
+  <div class="form-group">
+    <label for="contact">連絡先</label>
+    <input type="text" class="form-control" id="contact" required>
+  </div>
+  <div class="form-group">
+    <label for="location">所在地</label>
+    <input type="text" class="form-control" id="location" required>
+  </div>
+  <button type="submit" class="btn btn-primary">送信</button>
+</form>
 
-        document.getElementById('customer-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            fetch(config.apiUrl + '/add-customer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams([...formData])
-            }).then(response => response.json())
-              .then(data => {
-                if(data.success) {
-                    alert('顧客情報が正常に保存されました。');
-                    // フォームをリセット
-                    document.getElementById('customer-form').reset();
-                } else {
-                    alert('保存に失敗しました。');
-                }
-              })
-              .catch(error => console.error('Error:', error));
-        });
-    </script>
+</div>
+
+    <script type="module">
+  document.getElementById("customer-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const companyName = document.getElementById("companyName").value;
+    const industry = document.getElementById("industry").value;
+    const contact = document.getElementById("contact").value;
+    const location = document.getElementById("location").value;
+
+
+    const confirmMsg =
+  `以下の内容で登録します。\n\n` +
+  `会社名: ${companyName}\n` +
+  `業種: ${industry}\n` +
+  `連絡先: ${contact}\n` +
+  `所在地: ${location}\n\n` +
+  `よろしいですか？`;
+
+if (!window.confirm(confirmMsg)) {
+  return;
+}
+
+    try {
+      const res = await fetch('http://localhost:5041/add-customer', {
+
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ companyName, industry, contact, location })
+      });
+
+      if (res.ok) {
+        alert("登録成功！");
+        document.getElementById("customer-form").reset();
+      } else {
+        alert("登録失敗");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("通信エラー");
+    }
+  });
+</script>
+
+
     <!-- BootstrapのJavaScriptの読み込み -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>
+
+
+
+
+

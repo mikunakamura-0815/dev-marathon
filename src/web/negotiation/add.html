@@ -9,11 +9,49 @@
 </head>
 <body>
     <div class="container mt-5">
-        <!-- ここにHTMLを書く -->
+  <h2>顧客情報登録</h2>
+  <form id="customer-form">
+    <div class="form-group">
+      <label for="name">氏名</label>
+      <input type="text" class="form-control" id="name" required>
     </div>
+    <div class="form-group">
+      <label for="email">メールアドレス</label>
+      <input type="email" class="form-control" id="email" required>
+    </div>
+    <button type="submit" class="btn btn-primary">送信</button>
+  </form>
+</div>
+
     <script type="module">
-        <!-- ここにJSを書く -->
-    </script>
+  document.getElementById("customer-form").addEventListener("submit", async (e) => {
+    e.preventDefault(); // リロード防止
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+
+    try {
+      const res = await fetch("http://localhost:5041/add-customer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, email })
+      });
+
+      if (res.ok) {
+        alert("登録成功！");
+        document.getElementById("customer-form").reset();
+      } else {
+        alert("登録失敗");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("通信エラー");
+    }
+  });
+</script>
+
     <!-- BootstrapのJavaScriptの読み込み -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>

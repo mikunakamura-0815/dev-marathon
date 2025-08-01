@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>顧客詳細</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container mt-5">
+    <h2 class="mb-4">顧客詳細</h2>
+    <div id="customer-detail">読み込み中...</div>
+    <div class="form-group">
+  <label for="companyName">会社名</label>
+  <input type="text" id="companyName" class="form-control">
+</div>
+<div class="form-group">
+  <label for="industry">業種</label>
+  <input type="text" id="industry" class="form-control">
+</div>
+<div class="form-group">
+  <label for="contact">連絡先</label>
+  <input type="text" id="contact" class="form-control">
+</div>
+<div class="form-group">
+  <label for="location">所在地</label>
+  <input type="text" id="location" class="form-control">
+</div>
+<button id="update-btn" class="btn btn-primary mt-2">更新</button>
+
+    <button id="delete-btn" class="btn btn-danger mt-3">削除</button>
+
+  </div>
+
+  <script type="module">
+    import config from "./config.js"; // APIのURL設定ファイル
+
+    const params = new URLSearchParams(window.location.search);
+    const customerId = params.get("id");
+
+    fetch(`${config.apiUrl}/api/customer/${customerId}`)
+      .then(res => res.json())
+      .then(customer => {
+  const div = document.getElementById("customer-detail");
+  div.innerHTML = `
+    <p><strong>ID:</strong> ${customer.customer_id}</p>
+    <p><strong>会社名:</strong> ${customer.company_name}</p>
+    <p><strong>業種:</strong> ${customer.industry}</p>
+    <p><strong>連絡先:</strong> ${customer.contact}</p>
+    <p><strong>所在地:</strong> ${customer.location}</p>
+    <p><strong>作成日時:</strong> ${new Date(customer.created_date).toLocaleString()}</p>
+    <p><strong>更新日時:</strong> ${new Date(customer.updated_date).toLocaleString()}</p>
+  `;
+
+  // 🟡 フォームに初期値を反映する処理
+  document.getElementById("companyName").value = customer.company_name;
+  document.getElementById("industry").value = customer.industry;
+  document.getElementById("contact").value = customer.contact;
+  document.getElementById("location").value = customer.location;
+})
+
+      .catch(error => {
+        document.getElementById("customer-detail").innerText = "データ取得に失敗しました。";
+        console.error(error);
+      });
+
+
+
+document.getElementById("delete-btn").addEventListener("click", () => {
+  if (confirm("削除していいですか？")) {
+    fetch(`${config.apiUrl}/api/customer/${customerId}`, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (res.ok) {
+          alert("削除しました");
+          window.location.href = "/customer/list.html";
+        } else {
+          alert("削除に失敗しました");
+        }
+      })
+      .catch((err) => {
+        alert("通信エラーで削除できませんでした");
+        console.error(err);
+      });
+  }
+});
+
+document.getElementById("update-btn").addEventListener("click", () => {
+  const companyName = document.getElementById("companyName").value;
+  const industry = document.getElementById("industry").value;
+  const contact = document.getElementById("contact").value;
+  const location = document.getElementById("location").value;
+
+  fetch(`${config.apiUrl}/api/customer/${customerId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+  company_name: companyName,
+  industry: industry,
+  contact: contact,
+  location: location
+}),
+
+  })
+    .then((res) => {
+      if (res.ok) {
+        alert("更新しました！");
+        window.location.reload(); // 再読み込み
+      } else {
+        alert("更新に失敗しました");
+      }
+    })
+    .catch((err) => {
+      alert("通信エラーで更新できませんでした");
+      console.error(err);
+    });
+});
+
+
+  </script>
+</body>
+</html>
